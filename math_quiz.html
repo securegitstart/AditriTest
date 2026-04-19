@@ -484,6 +484,42 @@ body {
   animation: confettiFall linear forwards;
   z-index: 9998;
 }
+
+/* ══════════════════════════════════════
+   AREA SELECT SCREEN
+══════════════════════════════════════ */
+#area-screen { padding: 0 0 32px; }
+
+.area-body { padding: 24px 28px 0; width: 100%; }
+
+.area-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.area-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 10px;
+  border: 3px solid #e0dff5;
+  border-radius: 16px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: #5a3d9a;
+  background: white;
+  text-align: center;
+  transition: border-color .15s, background .15s, transform .1s;
+  gap: 8px;
+}
+.area-card .area-emoji { font-size: 1.8rem; line-height: 1; }
+.area-card:hover { border-color: #764ba2; background: #f3f0ff; transform: translateY(-2px); }
+.area-card.selected { border-color: #764ba2; background: #f3f0ff; box-shadow: 0 0 0 3px rgba(118,75,162,.2); }
+.area-card .q-count { font-size: 0.72rem; color: #888; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -515,6 +551,26 @@ body {
     </div>
     <div id="name-error" style="color:#c62828;font-weight:800;margin-top:10px;font-size:0.9rem;display:none;">
       Please enter your name first! 😊
+    </div>
+  </div>
+
+  <!-- ══ AREA SELECT SCREEN ══ -->
+  <div id="area-screen" class="screen">
+    <div class="welcome-banner">
+      <div class="mascot">🎯</div>
+      <h1>Choose Your Topic!</h1>
+      <p>Pick an area to practise, <span id="area-name"></span>!</p>
+    </div>
+    <div class="area-body">
+      <div class="area-grid" id="area-grid"></div>
+      <div style="display:flex;justify-content:center;margin-top:24px;">
+        <button class="btn-big btn-start" id="btn-area-start" onclick="beginSelectedArea()" disabled>
+          🚀 Start Quiz!
+        </button>
+      </div>
+      <div id="area-error" style="color:#c62828;font-weight:800;margin-top:10px;text-align:center;font-size:0.9rem;display:none;">
+        Please pick a topic first! 😊
+      </div>
     </div>
   </div>
 
@@ -594,6 +650,7 @@ body {
     <!-- Buttons -->
     <div class="results-btns">
       <button class="btn-big btn-green"   onclick="startQuiz()">🔄 Try Again!</button>
+      <button class="btn-big btn-blue"    onclick="showAreaSelect()">🎯 Change Topic</button>
       <button class="btn-big btn-purple"  onclick="startReview()">📖 Review Answers</button>
       <button class="btn-big btn-gray"    onclick="restartFromStart()">🏠 New Player</button>
     </div>
@@ -607,6 +664,7 @@ body {
     <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
       <button class="btn-big btn-purple" onclick="showResults(true)">← Back to Results</button>
       <button class="btn-big btn-green"  onclick="startQuiz()">🔄 Play Again!</button>
+      <button class="btn-big btn-blue"   onclick="showAreaSelect()">🎯 Change Topic</button>
       <button class="btn-big btn-gray"   onclick="restartFromStart()">🏠 New Player</button>
     </div>
   </div>
@@ -635,6 +693,15 @@ const QUESTIONS = [
 { category:"Multiplication", text:"A class plants 5 seeds in each of 8 flower pots. How many seeds are planted in all?", options:["13","35","40","45"], answer:2, explain:"8 pots × 5 seeds = 8 × 5 = 40. Counting by 5s eight times: 5, 10, 15, 20, 25, 30, 35, 40! 🌻" },
 { category:"Multiplication", text:"A rectangle is made of 6 rows with 7 squares in each row. How many squares are there in total?", options:["13","36","42","48"], answer:2, explain:"6 rows × 7 squares = 6 × 7 = 42. Think: (6 × 5) + (6 × 2) = 30 + 12 = 42! 🟪" },
 
+{ category:"Multiplication", text:"A spider has 8 legs. How many legs do 5 spiders have altogether?", options:["13","30","40","45"], answer:2, explain:"5 spiders × 8 legs = 5 × 8 = 40 legs! 🕷️" },
+{ category:"Multiplication", text:"Each student needs 4 pencils. There are 7 students. How many pencils are needed in total?", options:["11","24","28","32"], answer:2, explain:"7 students × 4 pencils = 7 × 4 = 28 pencils! ✏️" },
+{ category:"Multiplication", text:"A bookshelf has 5 shelves. Each shelf holds 9 books. How many books fit on the bookshelf?", options:["14","40","45","54"], answer:2, explain:"5 shelves × 9 books = 5 × 9 = 45 books! 📚" },
+{ category:"Multiplication", text:"A flower has 6 petals. How many petals do 8 flowers have in total?", options:["14","42","48","54"], answer:2, explain:"8 flowers × 6 petals = 8 × 6 = 48 petals! 🌸" },
+{ category:"Multiplication", text:"There are 4 buses. Each bus carries 9 students. How many students are there in total?", options:["13","32","36","40"], answer:2, explain:"4 buses × 9 students = 4 × 9 = 36 students! 🚌" },
+{ category:"Multiplication", text:"A pet store has 6 fish tanks. Each tank has 7 fish. How many fish are there altogether?", options:["13","36","42","48"], answer:2, explain:"6 tanks × 7 fish = 6 × 7 = 42 fish! 🐟" },
+{ category:"Multiplication", text:"Each box holds 8 cans of soup. There are 5 boxes. How many cans are there in all?", options:["13","35","40","45"], answer:2, explain:"5 boxes × 8 cans = 5 × 8 = 40 cans! 🥫" },
+{ category:"Multiplication", text:"A bag contains 9 marbles. There are 6 bags. How many marbles are there in total?", options:["15","48","54","63"], answer:2, explain:"6 bags × 9 marbles = 6 × 9 = 54 marbles! 🔵" },
+
 /* ── DIVISION (12) ── */
 { category:"Division", text:"Rami made 54 muffins. He put 6 muffins in each box. How many boxes does he need?", options:["48","60","9","6"], answer:2, explain:"54 ÷ 6 = 9. Ask yourself: what number × 6 = 54? 9 × 6 = 54! 🧁" },
 { category:"Division", text:"A librarian places 36 new books equally on 4 shelves. How many books go on each shelf?", options:["3","9","4","8"], answer:1, explain:"36 ÷ 4 = 9. Think: 4 × 9 = 36. Each shelf gets 9 books! 📚" },
@@ -649,6 +716,15 @@ const QUESTIONS = [
 { category:"Division", text:"56 students sit in 7 equal rows. How many students are in each row?", options:["6","7","8","9"], answer:2, explain:"56 ÷ 7 = 8. Think: 7 × 8 = 56. Each row has 8 students! 🎓" },
 { category:"Division", text:"There are 48 apples placed equally into 6 baskets. How many apples are in each basket?", options:["6","7","8","9"], answer:2, explain:"48 ÷ 6 = 8. Think: 6 × 8 = 48. Each basket holds 8 apples! 🍎" },
 
+{ category:"Division", text:"42 cupcakes are shared equally among 6 friends. How many cupcakes does each friend get?", options:["5","6","7","8"], answer:2, explain:"42 ÷ 6 = 7. Think: 6 × 7 = 42! 🧁" },
+{ category:"Division", text:"27 stickers are divided equally into 3 bags. How many stickers are in each bag?", options:["7","8","9","10"], answer:2, explain:"27 ÷ 3 = 9. Think: 3 × 9 = 27! ⭐" },
+{ category:"Division", text:"There are 35 children split into equal groups of 5. How many groups are there?", options:["5","6","7","8"], answer:2, explain:"35 ÷ 5 = 7. Count by 5s to 35 — that is 7 steps! 👫" },
+{ category:"Division", text:"64 beads are divided equally among 8 children. How many beads does each child get?", options:["6","7","8","9"], answer:2, explain:"64 ÷ 8 = 8. Think: 8 × 8 = 64! 📿" },
+{ category:"Division", text:"18 flowers are arranged equally in 3 vases. How many flowers are in each vase?", options:["4","5","6","7"], answer:2, explain:"18 ÷ 3 = 6. Think: 3 × 6 = 18! 🌸" },
+{ category:"Division", text:"30 apples are packed equally into 6 bags. How many apples are in each bag?", options:["3","4","5","6"], answer:2, explain:"30 ÷ 6 = 5. Think: 6 × 5 = 30! 🍎" },
+{ category:"Division", text:"A coach divides 45 players equally into 9 teams. How many players are on each team?", options:["3","4","5","6"], answer:2, explain:"45 ÷ 9 = 5. Count by 9s: 9, 18, 27, 36, 45 — that is 5 steps! ⚽" },
+{ category:"Division", text:"There are 32 chairs arranged equally in 4 rows. How many chairs are in each row?", options:["6","7","8","9"], answer:2, explain:"32 ÷ 4 = 8. Think: 4 × 8 = 32! 🪑" },
+
 /* ── ADDITION & SUBTRACTION (10) ── */
 { category:"Addition", text:"A park was visited by 356 adults and 598 children last week. What was the total number of visitors?", options:["854","944","954","964"], answer:2, explain:"356 + 598: ones 6+8=14 write 4 carry 1; tens 5+9+1=15 write 5 carry 1; hundreds 3+5+1=9. Answer: 954! 🌳" },
 { category:"Addition", text:"A teacher bought 18 red markers and 6 boxes of blue markers. Each box has 10 blue markers. What is the total number of markers?", options:["78","34","60","24"], answer:0, explain:"Blue markers = 6 × 10 = 60. Then total = 18 + 60 = 78 markers! 🖊️" },
@@ -660,6 +736,17 @@ const QUESTIONS = [
 { category:"Addition", text:"The school library had 245 fiction books and 387 non-fiction books. How many books are there in total?", options:["622","632","642","532"], answer:1, explain:"245 + 387: ones 5+7=12 write 2 carry 1; tens 4+8+1=13 write 3 carry 1; hundreds 2+3+1=6. Answer: 632! 📚" },
 { category:"Addition", text:"A family drove 513 miles on Saturday and 248 miles on Sunday. How many miles did they drive altogether?", options:["751","761","771","651"], answer:1, explain:"513 + 248: ones 3+8=11 write 1 carry 1; tens 1+4+1=6; hundreds 5+2=7. Answer: 761! 🚗" },
 { category:"Addition", text:"The store sold 629 blue tickets and 184 red tickets. How many tickets were sold in total?", options:["803","813","823","733"], answer:1, explain:"629 + 184: ones 9+4=13 write 3 carry 1; tens 2+8+1=11 write 1 carry 1; hundreds 6+1+1=8. Answer: 813! 🎟️" },
+
+{ category:"Addition", text:"Lena collected 267 shells on Monday and 145 shells on Tuesday. How many shells did she collect in all?", options:["302","402","412","422"], answer:2, explain:"267 + 145: ones 7+5=12 write 2 carry 1; tens 6+4+1=11 write 1 carry 1; hundreds 2+1+1=4. Answer: 412! 🐚" },
+{ category:"Addition", text:"A garden has 315 red flowers and 278 yellow flowers. How many flowers are there in total?", options:["483","583","593","693"], answer:2, explain:"315 + 278: ones 5+8=13 write 3 carry 1; tens 1+7+1=9; hundreds 3+2=5. Answer: 593! 🌺" },
+{ category:"Addition", text:"A school has 428 boys and 365 girls. How many students are there altogether?", options:["683","783","793","893"], answer:2, explain:"428 + 365: ones 8+5=13 write 3 carry 1; tens 2+6+1=9; hundreds 4+3=7. Answer: 793! 🏫" },
+{ category:"Addition", text:"A farmer picked 378 apples in the morning and 246 in the afternoon. How many apples in total?", options:["514","614","624","634"], answer:2, explain:"378 + 246: ones 8+6=14 write 4 carry 1; tens 7+4+1=12 write 2 carry 1; hundreds 3+2+1=6. Answer: 624! 🍎" },
+{ category:"Addition", text:"A toy store had 475 toys. They sold 318 toys. How many toys are left?", options:["147","157","167","793"], answer:1, explain:"475 − 318: ones 5−8 borrow→15−8=7; tens 6−1=5; hundreds 4−3=1. Answer: 157! 🧸" },
+{ category:"Addition", text:"A baker had 583 cookies. She gave away 247. How many cookies remain?", options:["226","326","336","346"], answer:2, explain:"583 − 247: ones 3−7 borrow→13−7=6; tens 7−4=3; hundreds 5−2=3. Answer: 336! 🍪" },
+{ category:"Addition", text:"A school library had 540 books. It lent out 195 books. How many books are still in the library?", options:["335","345","355","365"], answer:1, explain:"540 − 195: ones 0−5 borrow→10−5=5; tens 3−9 borrow→13−9=4; hundreds 4−1=3. Answer: 345! 📚" },
+{ category:"Addition", text:"A baker baked 236 chocolate cookies and 149 vanilla cookies. How many cookies in all?", options:["275","375","385","395"], answer:2, explain:"236 + 149: ones 6+9=15 write 5 carry 1; tens 3+4+1=8; hundreds 2+1=3. Answer: 385! 🍪" },
+{ category:"Addition", text:"A city library had 614 picture books and received 283 new books. How many books in total?", options:["787","877","887","897"], answer:3, explain:"614 + 283: ones 4+3=7; tens 1+8=9; hundreds 6+2=8. Answer: 897! 📚" },
+{ category:"Addition", text:"There were 450 people at the fair on Friday and 275 on Saturday. How many people visited in total?", options:["615","625","715","725"], answer:3, explain:"450 + 275: ones 0+5=5; tens 5+7=12 write 2 carry 1; hundreds 4+2+1=7. Answer: 725! 🎡" },
 
 /* ── AREA (10) ── */
 { category:"Area", formula:"Area = rows × tiles per row", text:"Box 1 is covered with 6 rows of 8 square tiles each. What is the area of the top of Box 1 in square inches?", options:["14 sq in","24 sq in","48 sq in","40 sq in"], answer:2, explain:"Area = 6 rows × 8 tiles = 6 × 8 = 48 square inches! 📦" },
@@ -673,6 +760,17 @@ const QUESTIONS = [
 { category:"Area", formula:"Area = length × width", text:"A table top is 4 feet wide and 7 feet long. What is the area of the table top?", options:["11 sq ft","22 sq ft","28 sq ft","35 sq ft"], answer:2, explain:"Area = 4 × 7 = 28 square feet! 🪑" },
 { category:"Area", formula:"Area = side × side", text:"A square patio has a side length of 6 meters. What is the area of the patio?", options:["12 sq m","24 sq m","36 sq m","42 sq m"], answer:2, explain:"Area = 6 × 6 = 36 square meters! 🏡" },
 
+{ category:"Area", formula:"Area = length × width", text:"A rectangular field is 5 metres long and 8 metres wide. What is the area?", options:["13 sq m","35 sq m","40 sq m","45 sq m"], answer:2, explain:"Area = 5 × 8 = 40 square metres! 🌾" },
+{ category:"Area", formula:"Area = side × side", text:"A square tile has a side of 8 centimetres. What is the area of the tile?", options:["16 sq cm","32 sq cm","56 sq cm","64 sq cm"], answer:3, explain:"Area = 8 × 8 = 64 square centimetres! 🟦" },
+{ category:"Area", formula:"Area = rows × tiles per row", text:"A floor is covered with 6 rows of 9 square tiles each. What is the area in square feet?", options:["15 sq ft","45 sq ft","54 sq ft","63 sq ft"], answer:2, explain:"Area = 6 × 9 = 54 square feet! 🏠" },
+{ category:"Area", formula:"Area = length × width", text:"A room is 4 feet wide and 12 feet long. What is the area of the room?", options:["16 sq ft","36 sq ft","48 sq ft","52 sq ft"], answer:2, explain:"Area = 4 × 12 = 48 square feet! 🏠" },
+{ category:"Area", formula:"Area = length × width", text:"A birthday card is 7 inches wide and 4 inches tall. What is the area of the card?", options:["11 sq in","22 sq in","28 sq in","35 sq in"], answer:2, explain:"Area = 7 × 4 = 28 square inches! 🎂" },
+{ category:"Area", formula:"Area = side × side", text:"A square park has a side of 7 metres. What is the area?", options:["14 sq m","28 sq m","42 sq m","49 sq m"], answer:3, explain:"Area = 7 × 7 = 49 square metres! 🌳" },
+{ category:"Area", formula:"Area = length × width", text:"A piece of paper is 3 cm wide and 8 cm long. What is the area?", options:["11 sq cm","22 sq cm","24 sq cm","32 sq cm"], answer:2, explain:"Area = 3 × 8 = 24 square centimetres! 📄" },
+{ category:"Area", formula:"Area = length × width", text:"A tablecloth is 5 feet wide and 9 feet long. What is the area?", options:["14 sq ft","40 sq ft","45 sq ft","54 sq ft"], answer:2, explain:"Area = 5 × 9 = 45 square feet! 🍽️" },
+{ category:"Area", formula:"Area = length × width", text:"A garden plot is 6 metres wide and 7 metres long. What is the area?", options:["13 sq m","36 sq m","42 sq m","48 sq m"], answer:2, explain:"Area = 6 × 7 = 42 square metres! 🌿" },
+{ category:"Area", formula:"Area = rows × tiles per row", text:"A wall is covered with 8 rows of 6 square tiles. What is the total area in square inches?", options:["14 sq in","42 sq in","48 sq in","56 sq in"], answer:2, explain:"Area = 8 rows × 6 tiles = 8 × 6 = 48 square inches! 🧱" },
+
 /* ── PERIMETER (10) ── */
 { category:"Perimeter", formula:"Octagon has 8 sides → Perimeter = 8 × side", text:"Samantha drew an octagon with each side measuring 3 cm. What is the perimeter?", options:["11 cm","24 cm","16 cm","64 cm"], answer:1, explain:"An octagon has 8 sides. Perimeter = 8 × 3 = 24 centimeters! 🔷" },
 { category:"Perimeter", formula:"Perimeter = 2 × (length + width)", text:"A rectangle is 9 cm long and 4 cm wide. What is the perimeter?", options:["13 cm","26 cm","36 cm","52 cm"], answer:1, explain:"Perimeter = 2 × (9 + 4) = 2 × 13 = 26 centimeters! 📐" },
@@ -685,6 +783,17 @@ const QUESTIONS = [
 { category:"Perimeter", formula:"Perimeter = 4 × side", text:"A square playground has a side length of 9 feet. What is the perimeter?", options:["18 ft","27 ft","36 ft","81 ft"], answer:2, explain:"Perimeter = 4 × 9 = 36 feet! 🛝" },
 { category:"Perimeter", formula:"Perimeter = sum of all sides", text:"An isosceles triangle has two sides of 4 cm each and a base of 6 cm. What is the perimeter?", options:["10 cm","12 cm","14 cm","16 cm"], answer:2, explain:"Perimeter = 4 + 4 + 6 = 14 centimeters! 🔺" },
 
+{ category:"Perimeter", formula:"Perimeter = 2 × (length + width)", text:"A rectangular table is 8 cm long and 3 cm wide. What is the perimeter?", options:["11 cm","22 cm","24 cm","32 cm"], answer:1, explain:"Perimeter = 2 × (8 + 3) = 2 × 11 = 22 centimetres! 📐" },
+{ category:"Perimeter", formula:"Perimeter = 4 × side", text:"A square napkin has a side of 4 inches. What is the perimeter?", options:["8 in","12 in","16 in","20 in"], answer:2, explain:"Perimeter = 4 × 4 = 16 inches! 🟨" },
+{ category:"Perimeter", formula:"Perimeter = sum of all sides", text:"An isosceles triangle has two sides of 7 cm each and a base of 5 cm. What is the perimeter?", options:["12 cm","14 cm","17 cm","19 cm"], answer:3, explain:"Perimeter = 7 + 7 + 5 = 19 centimetres! 🔺" },
+{ category:"Perimeter", formula:"Perimeter = 2 × (length + width)", text:"A swimming pool is 10 metres long and 6 metres wide. What is the perimeter?", options:["16 m","32 m","60 m","76 m"], answer:1, explain:"Perimeter = 2 × (10 + 6) = 2 × 16 = 32 metres! 🏊" },
+{ category:"Perimeter", formula:"Perimeter = 4 × side", text:"A square window has a side of 8 centimetres. What is the perimeter?", options:["16 cm","24 cm","32 cm","64 cm"], answer:2, explain:"Perimeter = 4 × 8 = 32 centimetres! 🪟" },
+{ category:"Perimeter", formula:"Perimeter = 2 × (length + width)", text:"A welcome mat is 5 feet long and 9 feet wide. What is the perimeter?", options:["14 ft","24 ft","28 ft","45 ft"], answer:2, explain:"Perimeter = 2 × (5 + 9) = 2 × 14 = 28 feet! 🚪" },
+{ category:"Perimeter", formula:"Hexagon has 6 sides → Perimeter = 6 × side", text:"A regular hexagon has each side measuring 4 cm. What is the perimeter?", options:["10 cm","20 cm","24 cm","28 cm"], answer:2, explain:"Hexagon has 6 sides. Perimeter = 6 × 4 = 24 centimetres! 🔷" },
+{ category:"Perimeter", formula:"Perimeter = 2 × (length + width)", text:"A rectangular frame is 11 metres long and 3 metres wide. What is the perimeter?", options:["14 m","28 m","33 m","44 m"], answer:1, explain:"Perimeter = 2 × (11 + 3) = 2 × 14 = 28 metres! 🖼️" },
+{ category:"Perimeter", formula:"Perimeter = sum of all sides", text:"A right triangle has sides of 6 cm, 8 cm, and 10 cm. What is the perimeter?", options:["14 cm","18 cm","24 cm","28 cm"], answer:2, explain:"Perimeter = 6 + 8 + 10 = 24 centimetres! 🔺" },
+{ category:"Perimeter", formula:"Perimeter = 4 × side", text:"A square tile has a side of 6 inches. What is the perimeter of the tile?", options:["12 in","18 in","24 in","36 in"], answer:2, explain:"Perimeter = 4 × 6 = 24 inches! 🟦" },
+
 /* ── TIME (8) ── */
 { category:"Time", text:"A movie started at 6:45. The movie lasted 1 hour and 15 minutes. What time did the movie end?", options:["8:00","7:45","7:00","6:00"], answer:0, explain:"6:45 + 1 hour = 7:45. Then 7:45 + 15 minutes = 8:00. The movie ended at 8:00! 🎬" },
 { category:"Time", text:"School starts at 8:00 AM. Lunch is served 3 hours and 30 minutes later. What time is lunch?", options:["10:30 AM","11:00 AM","11:30 AM","12:00 PM"], answer:2, explain:"8:00 + 3 hours = 11:00. Then 11:00 + 30 minutes = 11:30 AM! 🥪" },
@@ -694,6 +803,19 @@ const QUESTIONS = [
 { category:"Time", text:"A math class begins at 9:15 AM and ends at 10:45 AM. How long is the class?", options:["1 hour","1 hour 15 minutes","1 hour 30 minutes","2 hours"], answer:2, explain:"9:15 to 10:15 = 1 hour. 10:15 to 10:45 = 30 more minutes. Total: 1 hour 30 minutes! 📚" },
 { category:"Time", text:"Cooking started at 11:45 AM. The food was ready at 1:15 PM. How long did cooking take?", options:["1 hour","1 hour 15 minutes","1 hour 30 minutes","2 hours"], answer:2, explain:"11:45 to 12:45 = 1 hour. 12:45 to 1:15 = 30 more minutes. Total: 1 hour 30 minutes! 🍳" },
 { category:"Time", text:"The clock shows 7:30 AM. What time will it be in 2 hours and 15 minutes?", options:["9:15 AM","9:30 AM","9:45 AM","10:00 AM"], answer:2, explain:"7:30 + 2 hours = 9:30. Then 9:30 + 15 minutes = 9:45 AM! ⏰" },
+
+{ category:"Time", text:"A bus leaves at 5:30 PM and arrives 2 hours and 15 minutes later. What time does it arrive?", options:["7:15 PM","7:30 PM","7:45 PM","8:15 PM"], answer:2, explain:"5:30 + 2 hours = 7:30. Then 7:30 + 15 minutes = 7:45 PM! 🚌" },
+{ category:"Time", text:"Practice started at 2:50 PM and ended at 4:20 PM. How long was the practice?", options:["1 hour","1 hour 20 minutes","1 hour 30 minutes","1 hour 50 minutes"], answer:2, explain:"2:50 to 3:50 = 1 hour. 3:50 to 4:20 = 30 more minutes. Total: 1 hour 30 minutes! ⚽" },
+{ category:"Time", text:"Art class starts at 8:15 AM and lasts 40 minutes. What time does art class end?", options:["8:45 AM","8:50 AM","8:55 AM","9:00 AM"], answer:2, explain:"8:15 + 40 minutes: 8:15 + 45 = 9:00, but we only add 40, so 8:55 AM! 🎨" },
+{ category:"Time", text:"A field trip started at 10:00 AM and ended at 12:30 PM. How long was the field trip?", options:["2 hours","2 hours 30 minutes","3 hours","3 hours 30 minutes"], answer:1, explain:"10:00 to 12:00 = 2 hours. 12:00 to 12:30 = 30 more minutes. Total: 2 hours 30 minutes! 🚌" },
+{ category:"Time", text:"Nap time starts at 1:45 PM and lasts 1 hour and 45 minutes. What time does it end?", options:["3:15 PM","3:20 PM","3:30 PM","3:45 PM"], answer:2, explain:"1:45 + 1 hour = 2:45. Then 2:45 + 45 minutes = 3:30 PM! 😴" },
+{ category:"Time", text:"A movie started at 7:15 PM and ended at 9:45 PM. How long was the movie?", options:["2 hours","2 hours 15 minutes","2 hours 30 minutes","3 hours"], answer:2, explain:"7:15 to 9:15 = 2 hours. 9:15 to 9:45 = 30 more minutes. Total: 2 hours 30 minutes! 🎬" },
+{ category:"Time", text:"A train departs at 6:00 AM and arrives 3 hours and 25 minutes later. What time does it arrive?", options:["9:00 AM","9:15 AM","9:25 AM","9:35 AM"], answer:2, explain:"6:00 + 3 hours = 9:00. Then 9:00 + 25 minutes = 9:25 AM! 🚂" },
+{ category:"Time", text:"School ends at 3:30 PM. Sam stays 45 minutes for after-school club. What time does Sam leave?", options:["3:45 PM","4:00 PM","4:15 PM","4:30 PM"], answer:2, explain:"3:30 + 30 minutes = 4:00. Then 4:00 + 15 minutes = 4:15 PM! 🏫" },
+{ category:"Time", text:"A family drove from 11:30 AM to 2:00 PM. How long was the drive?", options:["2 hours","2 hours 30 minutes","3 hours","3 hours 30 minutes"], answer:1, explain:"11:30 to 1:30 = 2 hours. 1:30 to 2:00 = 30 more minutes. Total: 2 hours 30 minutes! 🚗" },
+{ category:"Time", text:"Story time begins at 9:00 AM and lasts 1 hour and 35 minutes. What time does it end?", options:["10:25 AM","10:30 AM","10:35 AM","10:45 AM"], answer:2, explain:"9:00 + 1 hour = 10:00. Then 10:00 + 35 minutes = 10:35 AM! 📖" },
+{ category:"Time", text:"A sports event started at 3:45 PM and ended at 5:15 PM. How long did it last?", options:["1 hour","1 hour 15 minutes","1 hour 30 minutes","2 hours"], answer:2, explain:"3:45 to 4:45 = 1 hour. 4:45 to 5:15 = 30 more minutes. Total: 1 hour 30 minutes! 🏅" },
+{ category:"Time", text:"A flight departs at 7:00 AM and lands 2 hours and 50 minutes later. What is the landing time?", options:["9:40 AM","9:45 AM","9:50 AM","10:00 AM"], answer:2, explain:"7:00 + 2 hours = 9:00. Then 9:00 + 50 minutes = 9:50 AM! ✈️" },
 
 /* ── FRACTIONS (10) ── */
 { category:"Fractions", text:"A pizza is cut into 4 equal slices. One slice is eaten. What fraction of the pizza is LEFT?", options:["1/4","2/4","3/4","4/4"], answer:2, explain:"4 slices total, 1 eaten, 3 remain. The fraction left is 3/4 (three-fourths)! 🍕" },
@@ -707,6 +829,17 @@ const QUESTIONS = [
 { category:"Fractions", text:"Which fraction is GREATER: 1/3 or 1/6?", options:["1/6","They are equal","1/3","Cannot tell"], answer:2, explain:"Same numerator (1), so smaller denominator = bigger fraction. 1/3 > 1/6 because thirds are bigger slices! 🍕" },
 { category:"Fractions", text:"Which fraction is EQUIVALENT to 2/4?", options:["2/3","1/4","3/4","1/2"], answer:3, explain:"2/4 = 1/2. Divide both by 2: 2÷2=1, 4÷2=2. So 2/4 = 1/2! ½" },
 
+{ category:"Fractions", text:"A chocolate bar is broken into 8 equal pieces. Jake eats 3 pieces. What fraction of the bar is LEFT?", options:["3/8","4/8","5/8","6/8"], answer:2, explain:"8 pieces total, 3 eaten, 5 remain. The fraction left is 5/8 (five-eighths)! 🍫" },
+{ category:"Fractions", text:"Which fraction is GREATER: 2/3 or 2/5?", options:["2/5","They are equal","2/3","Cannot tell"], answer:2, explain:"Same numerator (2), so smaller denominator = bigger fraction. 2/3 > 2/5 because thirds are bigger pieces! 🍕" },
+{ category:"Fractions", text:"Which fraction is EQUIVALENT (equal) to 4/8?", options:["1/4","1/3","1/2","2/3"], answer:2, explain:"4/8 = 1/2. Divide both by 4: 4÷4=1 and 8÷4=2. So 4/8 = 1/2! ½" },
+{ category:"Fractions", text:"6 of 10 children in a class like pizza. What fraction of the class likes pizza?", options:["4/10","5/10","6/10","6/6"], answer:2, explain:"6 out of 10 children = 6/10 (six-tenths) of the class! 🍕" },
+{ category:"Fractions", text:"Which fraction is SMALLER: 1/4 or 1/8?", options:["1/4","They are equal","1/8","Cannot tell"], answer:2, explain:"Same numerator (1), so bigger denominator = smaller fraction. 1/8 < 1/4 because eighths are smaller pieces! 🍰" },
+{ category:"Fractions", text:"A pie is cut into 6 equal slices. If 2 slices are eaten, what fraction of the pie REMAINS?", options:["2/6","3/6","4/6","5/6"], answer:2, explain:"6 slices total, 2 eaten, 4 remain. The fraction left is 4/6 (four-sixths)! 🥧" },
+{ category:"Fractions", text:"A shape is divided into 8 equal parts. Three parts are shaded. What fraction is NOT shaded?", options:["3/8","4/8","5/8","6/8"], answer:2, explain:"8 parts total, 3 shaded, so 8 − 3 = 5 are not shaded. The fraction not shaded is 5/8! 🟩" },
+{ category:"Fractions", text:"Which fraction is EQUIVALENT to 3/6?", options:["1/4","1/3","1/2","2/3"], answer:2, explain:"3/6 = 1/2. Divide both by 3: 3÷3=1 and 6÷3=2. So 3/6 = 1/2! ½" },
+{ category:"Fractions", text:"Which fraction is GREATER: 3/4 or 3/8?", options:["3/8","They are equal","3/4","Cannot tell"], answer:2, explain:"Same numerator (3), so smaller denominator = bigger fraction. 3/4 > 3/8 because fourths are bigger pieces! 🍕" },
+{ category:"Fractions", text:"A ribbon is divided equally into 4 parts. If you colour 3 parts blue, what fraction is blue?", options:["1/4","2/4","3/4","4/4"], answer:2, explain:"3 blue parts out of 4 total = 3/4 (three-quarters)! 🎀" },
+
 /* ── PLACE VALUE (8) ── */
 { category:"PlaceValue", text:"Which expression shows the expanded form of 92,060?", options:["(9×1,000)+(2×1,000)+(6×100)","(9×10,000)+(2×100)+(6×10)","(9×10,000)+(2×1,000)+(6×10)","(9×1,000)+(2×100)+(6×10)"], answer:2, explain:"9 is in ten-thousands (9×10,000); 2 is in thousands (2×1,000); 6 is in tens (6×10). Answer: (9×10,000)+(2×1,000)+(6×10)! 🔢" },
 { category:"PlaceValue", text:"What digit is in the HUNDREDS place of the number 4,735?", options:["4","7","3","5"], answer:1, explain:"4,735: Ones=5, Tens=3, Hundreds=7, Thousands=4. The hundreds digit is 7! 🔢" },
@@ -716,6 +849,19 @@ const QUESTIONS = [
 { category:"PlaceValue", text:"What number is equal to 7,000 + 300 + 40 + 2?", options:["7,342","7,324","7,432","3,742"], answer:0, explain:"7,000 + 300 + 40 + 2 = 7,342. Thousands=7, Hundreds=3, Tens=4, Ones=2! 🔢" },
 { category:"PlaceValue", text:"Round 3,567 to the nearest thousand.", options:["3,000","3,500","3,600","4,000"], answer:3, explain:"3,567 is between 3,000 and 4,000. The hundreds digit is 5 (≥5), so round UP to 4,000! 🎯" },
 { category:"PlaceValue", text:"Ferry data: Friday=1,298, Saturday=1,309, Sunday=1,290, Monday=1,398. Which order is LEAST to GREATEST?", options:["1,309 — 1,290 — 1,298 — 1,398","1,290 — 1,298 — 1,309 — 1,398","1,398 — 1,309 — 1,298 — 1,290","1,298 — 1,290 — 1,309 — 1,398"], answer:1, explain:"Compare: Sunday 1,290 < Friday 1,298 < Saturday 1,309 < Monday 1,398. Least to greatest! 🚢" },
+
+{ category:"PlaceValue", text:"What is the VALUE of the digit 5 in the number 5,823?", options:["5","50","500","5,000"], answer:3, explain:"In 5,823, the 5 is in the thousands place. Its value is 5 × 1,000 = 5,000! 🔢" },
+{ category:"PlaceValue", text:"Round 3,472 to the nearest hundred.", options:["3,400","3,470","3,500","4,000"], answer:2, explain:"3,472 is between 3,400 and 3,500. The tens digit is 7 (≥5), so round UP to 3,500! 🎯" },
+{ category:"PlaceValue", text:"Which expression shows the expanded form of 6,045?", options:["(6×1,000)+(4×100)+(5×1)","(6×1,000)+(4×10)+(5×1)","(6×100)+(4×10)+(5×1)","(6×10,000)+(4×10)+(5×1)"], answer:1, explain:"6 is in thousands (6×1,000); 0 in hundreds; 4 is in tens (4×10); 5 is in ones (5×1)! 🔢" },
+{ category:"PlaceValue", text:"Which digit is in the THOUSANDS place of 48,312?", options:["4","8","3","2"], answer:1, explain:"48,312: Ten-thousands=4, Thousands=8, Hundreds=3, Tens=1, Ones=2. The thousands digit is 8! 🔢" },
+{ category:"PlaceValue", text:"What number equals (4×10,000)+(6×1,000)+(3×100)+(5×1)?", options:["46,035","46,305","46,350","64,305"], answer:1, explain:"4 ten-thousands + 6 thousands + 3 hundreds + 0 tens + 5 ones = 46,305! 🔢" },
+{ category:"PlaceValue", text:"Round 7,849 to the nearest thousand.", options:["7,000","7,800","7,900","8,000"], answer:3, explain:"7,849 is between 7,000 and 8,000. The hundreds digit is 8 (≥5), so round UP to 8,000! 🎯" },
+{ category:"PlaceValue", text:"What is the VALUE of the digit 3 in the number 23,456?", options:["3","300","3,000","30,000"], answer:2, explain:"In 23,456, the 3 is in the thousands place. Its value is 3 × 1,000 = 3,000! 🔢" },
+{ category:"PlaceValue", text:"Which number is the GREATEST: 4,567  4,657  4,765  4,756?", options:["4,567","4,657","4,765","4,756"], answer:2, explain:"Compare hundreds digits: 5, 6, 7, 7. The two with 7 are 4,765 and 4,756. Compare tens: 6 > 5. So 4,765 is greatest! 🔢" },
+{ category:"PlaceValue", text:"Round 563 to the nearest ten.", options:["500","560","570","600"], answer:1, explain:"563 is between 560 and 570. The ones digit is 3 (less than 5), so round DOWN to 560! 🎯" },
+{ category:"PlaceValue", text:"Which expression shows the expanded form of 80,305?", options:["(8×10,000)+(3×100)+(5×1)","(8×10,000)+(3×1,000)+(5×1)","(8×1,000)+(3×100)+(5×10)","(8×10,000)+(3×100)+(5×10)"], answer:0, explain:"8 is in ten-thousands (8×10,000); 0 in thousands; 3 is in hundreds (3×100); 0 in tens; 5 is in ones (5×1)! 🔢" },
+{ category:"PlaceValue", text:"Which digit is in the TEN-THOUSANDS place of 72,481?", options:["7","2","4","8"], answer:0, explain:"72,481: Ten-thousands=7, Thousands=2, Hundreds=4, Tens=8, Ones=1. The ten-thousands digit is 7! 🔢" },
+{ category:"PlaceValue", text:"Which symbol makes this TRUE: 34,512 __ 34,521?", options:["=",">","<","Cannot tell"], answer:2, explain:"Both numbers match up to the hundreds. Compare tens: 1 < 2, so 34,512 < 34,521! 🔢" },
 
 /* ── PATTERNS (8) ── */
 { category:"Patterns", text:"Each toy robot needs 3 wheels. If the company makes 13 robots, how many wheels are needed?", options:["16","30","39","40"], answer:2, explain:"Rule: wheels = robots × 3. So 13 × 3 = 39 wheels! 🤖" },
@@ -727,6 +873,19 @@ const QUESTIONS = [
 { category:"Patterns", text:"What comes NEXT: 3, 6, 9, 12, ___?", options:["13","14","15","16"], answer:2, explain:"The pattern counts by 3s. 12 + 3 = 15! 🔢" },
 { category:"Patterns", text:"Function table: input 4→output 12, input 6→output 18, input 9→output ___. What is the missing output?", options:["18","24","27","36"], answer:2, explain:"The rule is multiply by 3: 4×3=12, 6×3=18, so 9×3=27! 📊" },
 
+{ category:"Patterns", text:"What is the missing number: 3, 9, 15, 21, ___?", options:["24","25","27","30"], answer:2, explain:"The pattern adds 6 each time. 21 + 6 = 27! ➕" },
+{ category:"Patterns", text:"Function table: input 2→output 8, input 4→output 16, input 8→output ___.", options:["24","28","32","36"], answer:2, explain:"The rule is multiply by 4: 2×4=8, 4×4=16, so 8×4=32! 📊" },
+{ category:"Patterns", text:"What comes NEXT in the pattern: 100, 90, 80, 70, ___?", options:["55","60","65","75"], answer:1, explain:"The pattern subtracts 10 each time. 70 − 10 = 60! ➖" },
+{ category:"Patterns", text:"What comes NEXT: 5, 10, 20, 40, ___?", options:["50","60","80","100"], answer:2, explain:"Each number is multiplied by 2. 40 × 2 = 80! ✖️" },
+{ category:"Patterns", text:"Function table: input 3→output 10, input 5→output 12, input 9→output ___.", options:["14","16","18","20"], answer:1, explain:"The rule is add 7: 3+7=10, 5+7=12, so 9+7=16! ➕" },
+{ category:"Patterns", text:"What comes NEXT: 2, 4, 6, 8, 10, 12, ___?", options:["13","14","15","16"], answer:1, explain:"The pattern counts by 2s. 12 + 2 = 14! 🔢" },
+{ category:"Patterns", text:"Function table: input 4→output 24, input 6→output 36, input 8→output ___.", options:["40","44","48","54"], answer:2, explain:"The rule is multiply by 6: 4×6=24, 6×6=36, so 8×6=48! 📊" },
+{ category:"Patterns", text:"What is the missing number: 99, 88, 77, 66, ___?", options:["44","55","56","65"], answer:1, explain:"The pattern subtracts 11 each time. 66 − 11 = 55! ➖" },
+{ category:"Patterns", text:"Function table: input 13→output 18, input 17→output 22, input 20→output ___.", options:["23","24","25","26"], answer:2, explain:"The rule is add 5: 13+5=18, 17+5=22, so 20+5=25! ➕" },
+{ category:"Patterns", text:"What comes NEXT: 7, 14, 21, 28, ___?", options:["31","33","35","37"], answer:2, explain:"The pattern counts by 7s. 28 + 7 = 35! 🔢" },
+{ category:"Patterns", text:"What comes NEXT in the pattern: 64, 32, 16, 8, ___?", options:["2","4","6","8"], answer:1, explain:"Each number is divided by 2. 8 ÷ 2 = 4! ➗" },
+{ category:"Patterns", text:"Find the missing number: 8, 16, 24, ___, 40", options:["30","32","33","34"], answer:1, explain:"The pattern adds 8 each time (multiples of 8). 24 + 8 = 32! ➕" },
+
 /* ── DATA & GRAPHS (8) ── */
 { category:"Data", text:"A bar graph shows: Dolphins=6, Sharks=10, Whales=4 students drew ocean animals. How many MORE students drew sharks than whales?", options:["4","6","8","10"], answer:1, explain:"More sharks than whales = 10 − 4 = 6 students! 🦈" },
 { category:"Data", text:"Tyler collected eggs for 14 days: 14 7 6 12 5 13 8 6 10 12 6 8 6 14. Which number appears MOST often?", options:["12","8","14","6"], answer:3, explain:"6 appears 4 times (positions 3, 8, 11, 13) — more than any other number! 🥚" },
@@ -736,6 +895,19 @@ const QUESTIONS = [
 { category:"Data", text:"Ferry data: Friday=1,298, Saturday=1,309, Sunday=1,290, Monday=1,398. Which comparison is TRUE?", options:["Friday = Monday","Saturday > Sunday","Monday < Sunday","Sunday > Friday"], answer:1, explain:"Saturday (1,309) > Sunday (1,290). That's the only true comparison! 🚢" },
 { category:"Data", text:"A tally chart shows: IIII IIII III tallies (4+4+3). How many items were counted?", options:["9","10","11","12"], answer:2, explain:"4 + 4 + 3 = 11 items total! 📊" },
 { category:"Data", text:"A dot plot shows test scores: score 8 has 3 dots, score 9 has 1 dot, score 10 has 3 dots, score 7 has 2 dots. Which score appears MOST often?", options:["7","8 and 10 (tied)","9","10"], answer:1, explain:"Both 8 and 10 each appear 3 times — more than 7 (twice) or 9 (once). They are tied! 📊" },
+
+{ category:"Data", text:"A bar graph shows books read: Week 1=8, Week 2=12, Week 3=6, Week 4=10. How many books were read in total?", options:["30","34","36","38"], answer:2, explain:"Total = 8 + 12 + 6 + 10 = 36 books! 📊" },
+{ category:"Data", text:"A bar graph shows: Cats=9, Dogs=14, Birds=5. How many MORE dogs were chosen than cats?", options:["3","4","5","6"], answer:2, explain:"More dogs than cats = 14 − 9 = 5! 🐶" },
+{ category:"Data", text:"A pictograph shows each smiley face = 4 students. If there are 5 smileys, how many students does that represent?", options:["9","16","20","24"], answer:2, explain:"5 smileys × 4 students each = 5 × 4 = 20 students! 📊" },
+{ category:"Data", text:"A tally chart shows: IIII IIII II (4+4+2). How many items were counted?", options:["8","9","10","11"], answer:2, explain:"4 + 4 + 2 = 10 items total! 📊" },
+{ category:"Data", text:"Quiz scores: 7, 9, 8, 7, 6, 9, 7. Which score appears MOST often?", options:["6","7","8","9"], answer:1, explain:"7 appears 3 times — more than any other. The most common score is 7! 📊" },
+{ category:"Data", text:"A bar graph shows: Apples=15, Oranges=20, Bananas=10, Grapes=25. Which fruit was chosen MOST?", options:["Apples","Oranges","Bananas","Grapes"], answer:3, explain:"Grapes had 25 votes, which is the highest. Grapes was chosen most! 🍇" },
+{ category:"Data", text:"A bar graph shows: Apples=15, Oranges=20, Bananas=10, Grapes=25. What is the total number of votes?", options:["60","65","70","75"], answer:2, explain:"Total = 15 + 20 + 10 + 25 = 70 votes! 📊" },
+{ category:"Data", text:"A class survey: 12 students like summer, 8 like winter. How many MORE students like summer?", options:["2","3","4","5"], answer:2, explain:"More summer = 12 − 8 = 4 students! ☀️" },
+{ category:"Data", text:"A dot plot: 5000 steps has 2 dots, 6000 has 4 dots, 7000 has 3 dots. Which step count appears MOST?", options:["5000","6000","7000","They are equal"], answer:1, explain:"6000 has 4 dots — more than 5000 (2 dots) or 7000 (3 dots). 6000 is most common! 👣" },
+{ category:"Data", text:"Pets owned by 8 students: 0, 1, 2, 1, 3, 1, 0, 2. Which number of pets is MOST common?", options:["0","1","2","3"], answer:1, explain:"1 appears 3 times (more than any other). The mode is 1! 🐾" },
+{ category:"Data", text:"Daily temperatures: Mon=72, Tue=68, Wed=75, Thu=70. What is the difference between the highest and lowest?", options:["3","5","7","8"], answer:2, explain:"Highest = 75 (Wed), Lowest = 68 (Tue). Difference = 75 − 68 = 7! 🌡️" },
+{ category:"Data", text:"A pictograph shows each star = 3 points. If a student earns 4 stars, how many points do they have?", options:["7","10","12","15"], answer:2, explain:"4 stars × 3 points each = 4 × 3 = 12 points! ⭐" },
 
 /* ── GEOMETRY (8) ── */
 { category:"Geometry", text:"Which shape has 4 equal sides AND 4 right angles (square corners)?", options:["Rectangle","Triangle","Square","Parallelogram"], answer:2, explain:"A square has 4 equal sides and 4 right angles. A rectangle has right angles but sides may not be equal! 🟦" },
@@ -747,6 +919,19 @@ const QUESTIONS = [
 { category:"Geometry", text:"Which statement about parallelograms is TRUE?", options:["A parallelogram has 3 sides","A parallelogram has 2 pairs of parallel sides","All parallelograms are squares","A parallelogram always has right angles"], answer:1, explain:"A parallelogram has 2 pairs of parallel sides — opposite sides are parallel and equal! 🔷" },
 { category:"Geometry", text:"How many sides does a TRIANGLE have?", options:["2","3","4","5"], answer:1, explain:"A triangle has exactly 3 sides and 3 angles. 'Tri' means three! 🔺" },
 
+{ category:"Geometry", text:"How many EDGES does a cube have?", options:["6","8","10","12"], answer:3, explain:"A cube has 12 edges — 4 on top, 4 on bottom, and 4 connecting them! 📦" },
+{ category:"Geometry", text:"Which 3D shape has ONE circular base and ONE pointed top (vertex)?", options:["Cylinder","Cone","Pyramid","Sphere"], answer:1, explain:"A cone has one circular base and one vertex at the top! 🍦" },
+{ category:"Geometry", text:"A polygon with 5 sides is called a ___.", options:["Quadrilateral","Pentagon","Hexagon","Octagon"], answer:1, explain:"A pentagon has exactly 5 sides. 'Penta' means five! ⭐" },
+{ category:"Geometry", text:"How many FACES does a triangular prism have?", options:["3","4","5","6"], answer:2, explain:"A triangular prism has 5 faces: 2 triangular faces and 3 rectangular faces! 🔺" },
+{ category:"Geometry", text:"Which 2D shape has NO straight sides and NO corners?", options:["Triangle","Rectangle","Circle","Hexagon"], answer:2, explain:"A circle has no straight sides and no corners — it is perfectly round! ⭕" },
+{ category:"Geometry", text:"How many VERTICES does a rectangular prism have?", options:["4","6","8","12"], answer:2, explain:"A rectangular prism has 8 vertices — one at each corner! 📦" },
+{ category:"Geometry", text:"A quadrilateral with exactly one pair of parallel sides is called a ___.", options:["Square","Rectangle","Trapezoid","Rhombus"], answer:2, explain:"A trapezoid has exactly one pair of parallel sides! 🔺" },
+{ category:"Geometry", text:"How many EDGES does a triangular pyramid have?", options:["4","5","6","8"], answer:2, explain:"A triangular pyramid has 6 edges: 3 on the base triangle + 3 going up to the point! 🔺" },
+{ category:"Geometry", text:"Which shape has 4 right angles but sides that are NOT necessarily equal?", options:["Square","Rectangle","Rhombus","Trapezoid"], answer:1, explain:"A rectangle has 4 right angles, but opposite sides are equal — not all four sides! 🟩" },
+{ category:"Geometry", text:"How many FACES does a square pyramid have?", options:["4","5","6","8"], answer:1, explain:"A square pyramid has 5 faces: 1 square base + 4 triangular faces! 🔺" },
+{ category:"Geometry", text:"Which of these 3D shapes has NO flat faces?", options:["Cube","Cylinder","Cone","Sphere"], answer:3, explain:"A sphere has no flat faces — it is completely round with one curved surface! 🌐" },
+{ category:"Geometry", text:"A polygon with 8 sides is called an ___.", options:["Hexagon","Heptagon","Octagon","Nonagon"], answer:2, explain:"An octagon has 8 sides. 'Octa' means eight! 🔷" },
+
 /* ── ODD & EVEN (6) ── */
 { category:"OddEven", text:"Which pair shows TWO ODD numbers from: 54, 65, 82, 36, 93?", options:["54 and 82","65 and 36","54 and 36","65 and 93"], answer:3, explain:"Odd numbers end in 1, 3, 5, 7, or 9. 65 ends in 5 ✓ and 93 ends in 3 ✓. Both are odd! 🔢" },
 { category:"OddEven", text:"Is the number 47 ODD or EVEN?", options:["Even","Odd","Neither","Both"], answer:1, explain:"47 ends in 7. Numbers ending in 1, 3, 5, 7, or 9 are ODD. So 47 is odd! 🔢" },
@@ -754,6 +939,21 @@ const QUESTIONS = [
 { category:"OddEven", text:"Which of these numbers is EVEN: 31, 42, 57, 63?", options:["31","42","57","63"], answer:1, explain:"Even numbers end in 0, 2, 4, 6, or 8. 42 ends in 2, so 42 is EVEN! ✅" },
 { category:"OddEven", text:"How many ODD numbers are there from 1 to 10?", options:["4","5","6","7"], answer:1, explain:"Odd numbers from 1 to 10: 1, 3, 5, 7, 9 — that is 5 odd numbers! 🔢" },
 { category:"OddEven", text:"Which set contains ONLY even numbers?", options:["{2, 4, 5, 8}","{1, 3, 5, 7}","{10, 12, 14, 17}","{2, 4, 6, 8}"], answer:3, explain:"{2, 4, 6, 8} — all four end in 2, 4, 6, or 8. They are ALL even! ✅" },
+
+{ category:"OddEven", text:"Is the number 128 ODD or EVEN?", options:["Odd","Even","Neither","Both"], answer:1, explain:"128 ends in 8. Numbers ending in 0, 2, 4, 6, or 8 are EVEN! ✅" },
+{ category:"OddEven", text:"What is the result when you add TWO ODD numbers?", options:["Always odd","Always even","Can be either","Always zero"], answer:1, explain:"Odd + Odd = Even. Try it: 3 + 5 = 8 (even)! 7 + 9 = 16 (even)! ➕" },
+{ category:"OddEven", text:"What is the result when you multiply an EVEN number by an ODD number?", options:["Always odd","Always even","Can be either","Always zero"], answer:1, explain:"Even × Odd = Even. Try it: 4 × 3 = 12 (even)! 6 × 5 = 30 (even)! ✖️" },
+{ category:"OddEven", text:"Which of these numbers is ODD: 34, 56, 78, 93?", options:["34","56","78","93"], answer:3, explain:"93 ends in 3. Numbers ending in 1, 3, 5, 7, or 9 are ODD! 🔢" },
+{ category:"OddEven", text:"How many EVEN numbers are there from 1 to 20?", options:["8","9","10","11"], answer:2, explain:"Even numbers from 1 to 20: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20 — that is 10! 🔢" },
+{ category:"OddEven", text:"Is the number 75 ODD or EVEN?", options:["Even","Odd","Neither","Both"], answer:1, explain:"75 ends in 5. Numbers ending in 1, 3, 5, 7, or 9 are ODD! 🔢" },
+{ category:"OddEven", text:"What is the result when you add an EVEN and an ODD number?", options:["Always odd","Always even","Can be either","Always zero"], answer:0, explain:"Even + Odd = Odd. Try it: 4 + 3 = 7 (odd)! 6 + 9 = 15 (odd)! ➕" },
+{ category:"OddEven", text:"Which set contains ONLY odd numbers?", options:["{11, 13, 14, 17}","{21, 23, 25, 27}","{32, 34, 36, 38}","{41, 43, 44, 47}"], answer:1, explain:"{21, 23, 25, 27} — all four end in 1, 3, 5, or 7. They are ALL odd! ✅" },
+{ category:"OddEven", text:"Is the number 0 (zero) ODD or EVEN?", options:["Odd","Even","Neither","Both"], answer:1, explain:"Zero is EVEN! Even numbers can be split into pairs with nothing left over, and 0 fits that rule! 🔢" },
+{ category:"OddEven", text:"Which of these numbers is EVEN: 47, 63, 82, 91?", options:["47","63","82","91"], answer:2, explain:"82 ends in 2. Numbers ending in 0, 2, 4, 6, or 8 are EVEN! ✅" },
+{ category:"OddEven", text:"What happens when you multiply two ODD numbers?", options:["Always odd","Always even","Can be either","Always zero"], answer:0, explain:"Odd × Odd = Odd. Try it: 3 × 5 = 15 (odd)! 7 × 3 = 21 (odd)! ✖️" },
+{ category:"OddEven", text:"Is the number 999 ODD or EVEN?", options:["Even","Odd","Neither","Both"], answer:1, explain:"999 ends in 9. Numbers ending in 1, 3, 5, 7, or 9 are ODD! 🔢" },
+{ category:"OddEven", text:"How many ODD numbers are there from 11 to 20?", options:["3","4","5","6"], answer:2, explain:"Odd numbers from 11 to 20: 11, 13, 15, 17, 19 — that is 5! 🔢" },
+{ category:"OddEven", text:"Which pair shows TWO EVEN numbers from: 17, 24, 35, 46, 58?", options:["17 and 35","24 and 46","35 and 58","17 and 24"], answer:1, explain:"Even numbers end in 0, 2, 4, 6, or 8. 24 ends in 4 ✓ and 46 ends in 6 ✓. Both are even! 🔢" },
 
 /* ── EQUATIONS (6) ── */
 { category:"Equations", text:"Glynna puts the same number of candles on 4 cakes. She has 3 boxes with 8 candles each. Which equation finds candles per cake?", options:["3 × 8 × 4 = □","3 + 8 ÷ 4 = □","3 + 8 × 4 = □","3 × 8 ÷ 4 = □"], answer:3, explain:"First: total candles = 3 × 8 = 24. Then divide among 4 cakes: 24 ÷ 4 = 6. Equation: 3 × 8 ÷ 4 = 6! 🕯️" },
@@ -763,6 +963,21 @@ const QUESTIONS = [
 { category:"Equations", text:"A teacher has 18 red markers plus 6 boxes of blue markers (10 each). Which equation finds TOTAL markers?", options:["18 × 6 + 10 = □","18 + 6 + 10 = □","18 + 6 × 10 = □","18 × 6 × 10 = □"], answer:2, explain:"Blue = 6 × 10 = 60. Total = 18 + 60 = 78. Equation: 18 + 6 × 10 = 78! 🖊️" },
 { category:"Equations", text:"24 students split into 6 equal teams. Then 3 more students join each team. How many students are on each team now?", options:["4","7","6","9"], answer:1, explain:"Step 1: 24 ÷ 6 = 4 students per team. Step 2: 4 + 3 = 7 students on each team! 👫" },
 
+{ category:"Equations", text:"If n + 7 = 15, what is the value of n?", options:["6","7","8","9"], answer:2, explain:"To find n, subtract 7 from both sides: n = 15 − 7 = 8! ➕" },
+{ category:"Equations", text:"24 ÷ □ = 6. What number goes in the box?", options:["3","4","5","6"], answer:1, explain:"Think: what number × 6 = 24? 4 × 6 = 24. So □ = 4! ➗" },
+{ category:"Equations", text:"□ × 5 = 35. What number goes in the box?", options:["5","6","7","8"], answer:2, explain:"35 ÷ 5 = 7. So □ = 7. Check: 7 × 5 = 35 ✓! ✖️" },
+{ category:"Equations", text:"48 = □ × 6. What number goes in the box?", options:["6","7","8","9"], answer:2, explain:"48 ÷ 6 = 8. So □ = 8. Check: 8 × 6 = 48 ✓! ✖️" },
+{ category:"Equations", text:"If n − 9 = 14, what is the value of n?", options:["5","14","23","25"], answer:2, explain:"To find n, add 9 to both sides: n = 14 + 9 = 23! ➕" },
+{ category:"Equations", text:"Which equation matches: 'A number plus 12 equals 20'?", options:["n − 12 = 20","n + 12 = 20","n × 12 = 20","12 − n = 20"], answer:1, explain:"'A number plus 12 equals 20' is written as n + 12 = 20. Solve: n = 20 − 12 = 8! ➕" },
+{ category:"Equations", text:"Which equation finds the total if there are 7 shelves with 6 books each?", options:["7 + 6 = □","7 − 6 = □","7 × 6 = □","7 ÷ 6 = □"], answer:2, explain:"Equal groups means multiplication! 7 × 6 = 42 books! ✖️" },
+{ category:"Equations", text:"Is this equation TRUE or FALSE: 5 × 6 = 6 × 5?", options:["True","False","Cannot tell","Only sometimes"], answer:0, explain:"5 × 6 = 30 and 6 × 5 = 30. They are equal! This is the commutative property of multiplication! ✅" },
+{ category:"Equations", text:"If □ − 15 = 23, what number goes in the box?", options:["8","28","38","48"], answer:2, explain:"To find □, add 15 to both sides: □ = 23 + 15 = 38! ➕" },
+{ category:"Equations", text:"4 × □ = 28. What number goes in the box?", options:["5","6","7","8"], answer:2, explain:"28 ÷ 4 = 7. So □ = 7. Check: 4 × 7 = 28 ✓! ✖️" },
+{ category:"Equations", text:"If n + 25 = 50, what is the value of n?", options:["20","25","30","75"], answer:1, explain:"To find n, subtract 25 from both sides: n = 50 − 25 = 25! ➕" },
+{ category:"Equations", text:"72 ÷ □ = 8. What number goes in the box?", options:["7","8","9","10"], answer:2, explain:"Think: 8 × □ = 72. 8 × 9 = 72. So □ = 9! ➗" },
+{ category:"Equations", text:"A store has 4 boxes with 9 items each. Which equation finds the TOTAL number of items?", options:["4 + 9 = □","4 − 9 = □","4 × 9 = □","4 ÷ 9 = □"], answer:2, explain:"Equal groups means multiplication! 4 × 9 = 36 items! ✖️" },
+{ category:"Equations", text:"Which number makes this TRUE: □ + □ = 18, if both boxes are the SAME number?", options:["6","8","9","10"], answer:2, explain:"We need n + n = 18, so 2n = 18, n = 9. Check: 9 + 9 = 18 ✓! ➕" },
+
 /* ── MONEY (8) ── */
 { category:"Money", text:"Mia has 2 quarters, 1 dime, and 3 pennies. How much money does she have in total?", options:["53 cents","63 cents","58 cents","65 cents"], answer:1, explain:"2 quarters = 50¢, 1 dime = 10¢, 3 pennies = 3¢. Add them: 50 + 10 + 3 = 63 cents! 💰" },
 { category:"Money", text:"A pencil costs 45 cents. Jake pays with 2 quarters. How much change does he get back?", options:["5 cents","10 cents","15 cents","55 cents"], answer:0, explain:"2 quarters = 50¢. Change = 50 − 45 = 5 cents back! 💵" },
@@ -771,7 +986,19 @@ const QUESTIONS = [
 { category:"Money", text:"Lily has $1.00. She buys an eraser for 35 cents. How much money does she have left?", options:["35 cents","55 cents","65 cents","75 cents"], answer:2, explain:"$1.00 = 100 cents. 100 − 35 = 65 cents left! 💵" },
 { category:"Money", text:"Which group of coins equals exactly 75 cents?", options:["3 dimes and 1 nickel","2 quarters and 1 dime","3 quarters","2 dimes and 5 nickels"], answer:2, explain:"3 quarters = 3 × 25¢ = 75¢! Option A = 35¢, Option B = 60¢, Option D = 45¢. Only 3 quarters = 75¢! 🪙" },
 { category:"Money", text:"A toy costs $2.35. Rosa pays with 3 one-dollar bills. How much change does she get?", options:["35 cents","55 cents","65 cents","75 cents"], answer:2, explain:"3 dollars = 300 cents. 300 − 235 = 65 cents in change! 💵" },
-{ category:"Money", text:"Tom earns $5 doing chores. He spends $3.25 on a book. How much money does he have left?", options:["$1.25","$1.50","$1.75","$2.75"], answer:2, explain:"$5.00 − $3.25 = $1.75. Think: $5.00 − $3.00 = $2.00, then $2.00 − $0.25 = $1.75! 📚💰" }
+{ category:"Money", text:"Tom earns $5 doing chores. He spends $3.25 on a book. How much money does he have left?", options:["$1.25","$1.50","$1.75","$2.75"], answer:2, explain:"$5.00 − $3.25 = $1.75. Think: $5.00 − $3.00 = $2.00, then $2.00 − $0.25 = $1.75! 📚💰" },
+{ category:"Money", text:"Olivia has 3 quarters, 2 dimes, and 1 nickel. How much money does she have in total?", options:["90 cents","95 cents","$1.00","$1.05"], answer:2, explain:"3 quarters = 75¢, 2 dimes = 20¢, 1 nickel = 5¢. Total = 75 + 20 + 5 = 100¢ = $1.00! 💰" },
+{ category:"Money", text:"A book costs $3.75. Carlos pays with a $5 bill. How much change does he get?", options:["$1.00","$1.25","$1.50","$1.75"], answer:1, explain:"$5.00 − $3.75 = $1.25. Think: $3.75 + $0.25 = $4.00, then + $1.00 = $5.00. Change = $1.25! 📚" },
+{ category:"Money", text:"How many NICKELS make $1.00?", options:["10","15","20","25"], answer:2, explain:"Each nickel is 5¢. $1.00 = 100¢. 100 ÷ 5 = 20 nickels! 🪙" },
+{ category:"Money", text:"Which is MORE money: 7 dimes OR 3 quarters?", options:["7 dimes","3 quarters","They are equal","Cannot tell"], answer:1, explain:"7 dimes = 70¢. 3 quarters = 75¢. 75¢ > 70¢, so 3 quarters is more! 🪙" },
+{ category:"Money", text:"A toy costs $1.35. Maya pays with $2.00. How much change does she receive?", options:["55 cents","65 cents","75 cents","85 cents"], answer:1, explain:"$2.00 − $1.35 = 65¢. Think: $1.35 + $0.65 = $2.00! 💵" },
+{ category:"Money", text:"How many QUARTERS make $2.00?", options:["4","6","8","10"], answer:2, explain:"Each quarter = 25¢. $2.00 = 200¢. 200 ÷ 25 = 8 quarters! 🪙" },
+{ category:"Money", text:"Ben has 4 quarters, 3 dimes, and 2 nickels. How much money does he have in total?", options:["$1.20","$1.30","$1.40","$1.50"], answer:2, explain:"4 quarters = $1.00, 3 dimes = 30¢, 2 nickels = 10¢. Total = $1.40! 💰" },
+{ category:"Money", text:"A snack costs $4.50. Priya pays with $5.00. How much change does she get?", options:["25 cents","50 cents","55 cents","75 cents"], answer:1, explain:"$5.00 − $4.50 = $0.50 = 50 cents! 💵" },
+{ category:"Money", text:"Which group of coins equals exactly $0.50?", options:["4 dimes and 1 nickel","1 quarter and 3 dimes","2 quarters","1 quarter and 2 dimes"], answer:2, explain:"2 quarters = 2 × 25¢ = 50¢. Option A=45¢, B=55¢, D=45¢. Only 2 quarters = 50¢! 🪙" },
+{ category:"Money", text:"A pencil costs 15 cents. How much do 3 pencils cost?", options:["30 cents","40 cents","45 cents","50 cents"], answer:2, explain:"3 × 15¢ = 45¢. Count by 15s: 15, 30, 45! ✏️" },
+{ category:"Money", text:"A birthday card costs $2.25. Anna pays with $3.00. How much change does she get?", options:["55 cents","65 cents","75 cents","85 cents"], answer:2, explain:"$3.00 − $2.25 = $0.75 = 75 cents! 🎂" },
+{ category:"Money", text:"Jake earns $2.50 on Monday and $1.75 on Tuesday. How much did he earn in total?", options:["$3.75","$4.00","$4.25","$4.50"], answer:2, explain:"$2.50 + $1.75: 50¢ + 75¢ = $1.25, carry $1; $2 + $1 + $1 = $4. Total = $4.25! 💰" }
 ];
 
 /* ═══════════════════════════════════════════════════════
@@ -800,10 +1027,31 @@ const BADGES = [
 ];
 
 /* ═══════════════════════════════════════════════════════
+   AREA METADATA
+═══════════════════════════════════════════════════════ */
+const AREA_META = [
+  { id:'Multiplication', label:'Multiplication',        emoji:'✖️' },
+  { id:'Division',       label:'Division',              emoji:'➗' },
+  { id:'Addition',       label:'Addition & Subtraction',emoji:'➕' },
+  { id:'Area',           label:'Area',                  emoji:'📐' },
+  { id:'Perimeter',      label:'Perimeter',             emoji:'📏' },
+  { id:'Time',           label:'Time',                  emoji:'⏰' },
+  { id:'Fractions',      label:'Fractions',             emoji:'½' },
+  { id:'PlaceValue',     label:'Place Value',           emoji:'🔢' },
+  { id:'Patterns',       label:'Patterns',              emoji:'🔁' },
+  { id:'Data',           label:'Data & Graphs',         emoji:'📊' },
+  { id:'Geometry',       label:'Geometry',              emoji:'🔷' },
+  { id:'OddEven',        label:'Odd & Even',            emoji:'🔄' },
+  { id:'Equations',      label:'Equations',             emoji:'⚖️' },
+  { id:'Money',          label:'Money',                 emoji:'💰' },
+];
+
+/* ═══════════════════════════════════════════════════════
    STATE
 ═══════════════════════════════════════════════════════ */
 const QUIZ_SIZE = 20;
 let studentName = '';
+let selectedArea = '';
 let deck = [], current = 0;
 let answers = [], correct = [];
 let catStats = {};
@@ -889,11 +1137,42 @@ function startWelcome() {
   if (!nm) { $('name-error').style.display = 'block'; $('student-name').focus(); return; }
   $('name-error').style.display = 'none';
   studentName = nm;
+  showAreaSelect();
+}
+
+function showAreaSelect() {
+  $('area-name').textContent = studentName;
+  const grid = $('area-grid');
+  grid.innerHTML = '';
+  AREA_META.forEach(a => {
+    const count = QUESTIONS.filter(q => q.category === a.id).length;
+    const qs = Math.min(count, QUIZ_SIZE);
+    const card = document.createElement('button');
+    card.className = 'area-card' + (selectedArea === a.id ? ' selected' : '');
+    card.dataset.area = a.id;
+    card.innerHTML = `<span class="area-emoji">${a.emoji}</span>${a.label}<span class="q-count">${qs} questions</span>`;
+    card.addEventListener('click', () => {
+      selectedArea = a.id;
+      document.querySelectorAll('.area-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      $('btn-area-start').disabled = false;
+      $('area-error').style.display = 'none';
+    });
+    grid.appendChild(card);
+  });
+  $('btn-area-start').disabled = !selectedArea;
+  $('area-error').style.display = 'none';
+  showScreen('area-screen');
+}
+
+function beginSelectedArea() {
+  if (!selectedArea) { $('area-error').style.display = 'block'; return; }
   startQuiz();
 }
 
 function startQuiz() {
-  deck = shuffle(QUESTIONS).slice(0, QUIZ_SIZE);
+  const pool = QUESTIONS.filter(q => q.category === selectedArea);
+  deck = shuffle(pool).slice(0, QUIZ_SIZE);
   current = 0;
   answers = new Array(deck.length).fill(null);
   correct = new Array(deck.length).fill(null);
@@ -1149,7 +1428,7 @@ function showResults(fromReview) {
 
   showScreen('results-screen');
   if (sc >= 14) fireConfetti();
-1
+
   setTimeout(() => {
     document.querySelectorAll('.cb-bar').forEach(b => {
       b.style.width = b.dataset.pct + '%';
@@ -1190,6 +1469,7 @@ function startReview() {
 
 function restartFromStart() {
   studentName = '';
+  selectedArea = '';
   deck = []; answers = []; correct = []; catStats = {};
   $('student-name').value = '';
   $('name-error').style.display = 'none';
