@@ -476,6 +476,18 @@ body {
   0%   { transform: translateY(-20px) rotate(0deg);   opacity:1; }
   100% { transform: translateY(100vh)  rotate(720deg); opacity:0; }
 }
+@keyframes starFall {
+  0%   { transform: translateY(-30px) rotate(0deg) scale(1);   opacity: 1; }
+  70%  { opacity: 1; }
+  100% { transform: translateY(100vh) rotate(360deg) scale(0.6); opacity: 0; }
+}
+.falling-star {
+  position: fixed;
+  top: 0;
+  pointer-events: none;
+  animation: starFall linear forwards;
+  z-index: 9999;
+}
 .confetti-piece {
   position: fixed;
   width: 10px; height: 10px;
@@ -1273,6 +1285,26 @@ function fireConfetti() {
   }
 }
 
+/* ── Falling stars ── */
+function fallStars() {
+  const emojis = ['⭐','🌟','✨','💫','🎉','⭐','🌟','✨'];
+  for (let i = 0; i < 22; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'falling-star';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.cssText = `
+        left: ${Math.random() * 100}vw;
+        font-size: ${1.2 + Math.random() * 1.8}rem;
+        animation-duration: ${1.2 + Math.random() * 1.4}s;
+        animation-delay: ${Math.random() * 0.4}s;
+      `;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }, i * 60);
+  }
+}
+
 /* ── Star burst ── */
 function starBurst(x, y) {
   const emojis = ['⭐','🌟','✨','💫','🎉'];
@@ -1461,9 +1493,9 @@ function checkAnswer() {
   correct[current] = (chosen === q.answer);
   if (correct[current]) {
     catStats[q.category].c++;
-    // star burst from the correct option
     const rect = selected.getBoundingClientRect();
     starBurst(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    fallStars();
   }
   renderQ();
 }
