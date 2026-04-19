@@ -520,10 +520,145 @@ body {
 .area-card:hover { border-color: #764ba2; background: #f3f0ff; transform: translateY(-2px); }
 .area-card.selected { border-color: #764ba2; background: #f3f0ff; box-shadow: 0 0 0 3px rgba(118,75,162,.2); }
 .area-card .q-count { font-size: 0.72rem; color: #888; font-weight: 700; }
+
+/* ══════════════════════════════════════
+   TWO-PANEL LAYOUT
+══════════════════════════════════════ */
+.app-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  max-width: 1240px;
+}
+
+.app-wrapper > .card {
+  flex: 0 0 680px;
+  width: 680px;
+  max-width: 680px;
+}
+
+/* ══════════════════════════════════════
+   WHITEBOARD PANEL
+══════════════════════════════════════ */
+.whiteboard-panel {
+  flex: 1;
+  min-width: 320px;
+  max-width: 520px;
+  background: white;
+  border-radius: 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  align-self: stretch;
+}
+
+.wb-header {
+  background: linear-gradient(135deg, #43e97b, #38f9d7);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.wb-title {
+  font-weight: 900;
+  font-size: 1rem;
+  color: #1a4a30;
+}
+
+.wb-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.wb-tool-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  background: rgba(255,255,255,.5);
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, border-color .15s;
+}
+.wb-tool-btn:hover { background: rgba(255,255,255,.8); }
+.wb-tool-btn.active { background: white; border-color: #1a4a30; }
+
+.wb-size-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.wb-size-wrap input[type=range] {
+  width: 70px;
+  accent-color: #1a4a30;
+  cursor: pointer;
+}
+
+.wb-color-pick {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 3px solid white;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+}
+
+.wb-clear-btn {
+  padding: 6px 14px;
+  background: rgba(255,255,255,.7);
+  border: none;
+  border-radius: 20px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: #1a4a30;
+  cursor: pointer;
+  transition: background .15s;
+}
+.wb-clear-btn:hover { background: white; }
+
+.wb-canvas-wrap {
+  flex: 1;
+  position: relative;
+  background: #fffef7;
+  background-image:
+    linear-gradient(rgba(180,180,220,.2) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180,180,220,.2) 1px, transparent 1px);
+  background-size: 32px 32px;
+  cursor: crosshair;
+  min-height: 300px;
+}
+
+#wb-canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  touch-action: none;
+}
+
+@media (max-width: 1100px) {
+  .app-wrapper > .card { flex: 0 0 560px; width: 560px; max-width: 560px; }
+}
+
+@media (max-width: 860px) {
+  .app-wrapper { flex-direction: column; align-items: center; }
+  .app-wrapper > .card { flex: unset; width: 100%; max-width: 680px; }
+  .whiteboard-panel { width: 100%; max-width: 680px; min-height: 260px; }
+}
 </style>
 </head>
 <body>
 
+<div class="app-wrapper" id="app-wrapper">
 <div class="card">
 
   <!-- ══ WELCOME SCREEN ══ -->
@@ -669,7 +804,29 @@ body {
     </div>
   </div>
 
-</div>
+</div><!-- end .card -->
+
+  <!-- ══ WHITEBOARD PANEL ══ -->
+  <div class="whiteboard-panel" id="whiteboard-panel" style="display:none">
+    <div class="wb-header">
+      <span class="wb-title">✏️ Scratch Pad</span>
+      <div class="wb-tools">
+        <button class="wb-tool-btn active" id="wb-pencil" title="Pencil" onclick="setWbTool('pencil')">✏️</button>
+        <button class="wb-tool-btn" id="wb-eraser" title="Eraser" onclick="setWbTool('eraser')">🧹</button>
+        <div class="wb-size-wrap">
+          <span style="font-size:.75rem;font-weight:800;color:#1a4a30;">Size</span>
+          <input type="range" id="wb-size" min="2" max="24" value="4">
+        </div>
+        <input type="color" class="wb-color-pick" id="wb-color" value="#1a1a2e" title="Colour">
+        <button class="wb-clear-btn" onclick="wbClear()">🗑️ Clear</button>
+      </div>
+    </div>
+    <div class="wb-canvas-wrap" id="wb-canvas-wrap">
+      <canvas id="wb-canvas"></canvas>
+    </div>
+  </div>
+
+</div><!-- end .app-wrapper -->
 
 <!-- ══ STAR BURST CONTAINER ══ -->
 <div id="burst-container"></div>
@@ -1065,6 +1222,13 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $(id).classList.add('active');
   document.querySelector('.card').scrollTop = 0;
+  const wb = $('whiteboard-panel');
+  if (id === 'quiz-screen') {
+    wb.style.display = 'flex';
+    requestAnimationFrame(resizeWbCanvas);
+  } else {
+    wb.style.display = 'none';
+  }
 }
 
 function shuffle(arr) {
@@ -1475,6 +1639,92 @@ function restartFromStart() {
   $('name-error').style.display = 'none';
   showScreen('welcome-screen');
 }
+
+/* ═══════════════════════════════════════════════════════
+   WHITEBOARD
+═══════════════════════════════════════════════════════ */
+(function () {
+  const canvas  = document.getElementById('wb-canvas');
+  const ctx     = canvas.getContext('2d');
+  let drawing   = false;
+  let wbTool    = 'pencil';
+  let lastX = 0, lastY = 0;
+
+  function getPos(e) {
+    const r = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return [
+      (src.clientX - r.left) * (canvas.width  / r.width),
+      (src.clientY - r.top)  * (canvas.height / r.height)
+    ];
+  }
+
+  function startDraw(e) {
+    e.preventDefault();
+    drawing = true;
+    [lastX, lastY] = getPos(e);
+    ctx.beginPath();
+    ctx.arc(lastX, lastY, lineWidth() / 2, 0, Math.PI * 2);
+    ctx.fillStyle = wbTool === 'eraser' ? '#fffef7' : $('wb-color').value;
+    ctx.fill();
+  }
+
+  function draw(e) {
+    if (!drawing) return;
+    e.preventDefault();
+    const [x, y] = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.strokeStyle = wbTool === 'eraser' ? '#fffef7' : $('wb-color').value;
+    ctx.lineWidth   = lineWidth();
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+    ctx.stroke();
+    [lastX, lastY] = [x, y];
+  }
+
+  function stopDraw() { drawing = false; }
+
+  function lineWidth() {
+    const sz = parseInt($('wb-size').value);
+    return wbTool === 'eraser' ? sz * 4 : sz;
+  }
+
+  canvas.addEventListener('mousedown',  startDraw);
+  canvas.addEventListener('mousemove',  draw);
+  canvas.addEventListener('mouseup',    stopDraw);
+  canvas.addEventListener('mouseleave', stopDraw);
+  canvas.addEventListener('touchstart', startDraw, { passive: false });
+  canvas.addEventListener('touchmove',  draw,      { passive: false });
+  canvas.addEventListener('touchend',   stopDraw);
+
+  window.setWbTool = function(tool) {
+    wbTool = tool;
+    document.querySelectorAll('.wb-tool-btn').forEach(b => b.classList.remove('active'));
+    $(tool === 'pencil' ? 'wb-pencil' : 'wb-eraser').classList.add('active');
+  };
+
+  window.wbClear = function() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  window.resizeWbCanvas = function() {
+    const wrap = $('wb-canvas-wrap');
+    const w = wrap.clientWidth;
+    const h = wrap.clientHeight || Math.max(wrap.offsetHeight, 300);
+    if (w > 0 && h > 0) {
+      const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      canvas.width  = w;
+      canvas.height = h;
+      ctx.putImageData(img, 0, 0);
+    }
+  };
+
+  window.addEventListener('resize', () => {
+    if ($('whiteboard-panel').style.display !== 'none') resizeWbCanvas();
+  });
+})();
 </script>
 </body>
 </html>
