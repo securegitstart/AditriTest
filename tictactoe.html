@@ -16,50 +16,181 @@
       background: #1a1a2e;
       font-family: 'Segoe UI', sans-serif;
       color: #eee;
+      overflow: hidden;
     }
 
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
+    /* ── Setup Screen ── */
+    #setup-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    #setup-screen h1 {
+      font-size: 2.4rem;
       letter-spacing: 3px;
       color: #e94560;
     }
 
+    .player-card {
+      background: #16213e;
+      border: 1px solid #0f3460;
+      border-radius: 14px;
+      padding: 20px 28px;
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .player-card h3 {
+      font-size: 1rem;
+      color: #a8dadc;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .player-card input[type="text"] {
+      background: #0f3460;
+      border: 1px solid #1a4a8a;
+      border-radius: 8px;
+      color: #eee;
+      font-size: 1rem;
+      padding: 10px 14px;
+      outline: none;
+      width: 100%;
+    }
+
+    .player-card input[type="text"]:focus {
+      border-color: #e94560;
+    }
+
+    .symbol-choice {
+      display: flex;
+      gap: 12px;
+    }
+
+    .symbol-btn {
+      flex: 1;
+      padding: 10px;
+      font-size: 1.4rem;
+      font-weight: bold;
+      border: 2px solid #0f3460;
+      border-radius: 10px;
+      background: #0f3460;
+      color: #888;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .symbol-btn.selected-x { border-color: #e94560; color: #e94560; background: #1e0a10; }
+    .symbol-btn.selected-o { border-color: #a8dadc; color: #a8dadc; background: #071b1d; }
+
+    #start-btn {
+      padding: 14px 48px;
+      font-size: 1.1rem;
+      background: #e94560;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    #start-btn:hover { background: #c73652; transform: scale(1.05); }
+    #start-btn:disabled { background: #555; cursor: not-allowed; transform: none; }
+
+    .error-msg {
+      color: #e94560;
+      font-size: 0.85rem;
+      min-height: 1rem;
+    }
+
+    /* ── Game Screen ── */
+    #game-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    #game-screen h1 {
+      font-size: 2rem;
+      letter-spacing: 3px;
+      color: #e94560;
+    }
+
+    #score {
+      display: flex;
+      gap: 20px;
+    }
+
+    .score-box {
+      text-align: center;
+      background: #16213e;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: 1px solid #0f3460;
+      min-width: 100px;
+    }
+
+    .score-box .player-name {
+      font-size: 0.8rem;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 2px;
+    }
+
+    .score-box .player-symbol {
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    .score-box .player-score {
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    .score-box.p1 .player-symbol, .score-box.p1 .player-score { color: #e94560; }
+    .score-box.p2 .player-symbol, .score-box.p2 .player-score { color: #a8dadc; }
+    .score-box.draw .player-score { color: #888; }
+
     #status {
-      font-size: 1.2rem;
-      margin-bottom: 20px;
+      font-size: 1.1rem;
       min-height: 1.5rem;
       color: #a8dadc;
+      text-align: center;
     }
 
     #board {
       display: grid;
-      grid-template-columns: repeat(3, 110px);
-      grid-template-rows: repeat(3, 110px);
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
       gap: 8px;
     }
 
     .cell {
-      width: 110px;
-      height: 110px;
+      width: 100px;
+      height: 100px;
       background: #16213e;
       border: 2px solid #0f3460;
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 3rem;
+      font-size: 2.8rem;
       font-weight: bold;
       cursor: pointer;
       transition: background 0.2s, transform 0.1s;
       user-select: none;
     }
 
-    .cell:hover:not(.taken) {
-      background: #0f3460;
-      transform: scale(1.05);
-    }
-
+    .cell:hover:not(.taken) { background: #0f3460; transform: scale(1.05); }
     .cell.x { color: #e94560; }
     .cell.o { color: #a8dadc; }
 
@@ -71,11 +202,67 @@
 
     @keyframes pulse {
       from { box-shadow: 0 0 8px #e94560; }
-      to   { box-shadow: 0 0 20px #e94560; }
+      to   { box-shadow: 0 0 24px #e94560; }
     }
 
     #restart {
-      margin-top: 28px;
+      padding: 11px 32px;
+      font-size: 0.95rem;
+      background: #e94560;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    #restart:hover { background: #c73652; transform: scale(1.05); }
+
+    #change-players {
+      background: none;
+      border: 1px solid #444;
+      color: #888;
+      padding: 8px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    #change-players:hover { border-color: #a8dadc; color: #a8dadc; }
+
+    /* ── Result Overlay ── */
+    #result-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 10;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    #result-overlay.show { display: flex; }
+
+    #result-box {
+      background: #16213e;
+      border-radius: 20px;
+      padding: 36px 48px;
+      text-align: center;
+      border: 2px solid #0f3460;
+      position: relative;
+      z-index: 11;
+    }
+
+    #result-emoji { font-size: 4rem; margin-bottom: 8px; }
+    #result-title { font-size: 1.8rem; font-weight: bold; margin-bottom: 6px; }
+    #result-subtitle { font-size: 1rem; color: #aaa; margin-bottom: 20px; }
+
+    #result-next {
       padding: 12px 36px;
       font-size: 1rem;
       background: #e94560;
@@ -87,131 +274,384 @@
       transition: background 0.2s, transform 0.1s;
     }
 
-    #restart:hover {
-      background: #c73652;
-      transform: scale(1.05);
+    #result-next:hover { background: #c73652; transform: scale(1.05); }
+
+    /* ── Particles ── */
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9;
     }
 
-    #score {
-      display: flex;
-      gap: 40px;
-      margin-bottom: 20px;
-      font-size: 1rem;
+    /* ── Loser rain ── */
+    .drop {
+      position: fixed;
+      font-size: 1.4rem;
+      animation: fallDown linear forwards;
+      pointer-events: none;
+      z-index: 9;
     }
 
-    .score-box {
-      text-align: center;
-      background: #16213e;
-      padding: 10px 24px;
-      border-radius: 10px;
-      border: 1px solid #0f3460;
+    @keyframes fallDown {
+      0%   { transform: translateY(-40px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(20deg); opacity: 0.3; }
     }
 
-    .score-box span {
-      display: block;
-      font-size: 1.8rem;
-      font-weight: bold;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
-
-    .score-box.x-score span { color: #e94560; }
-    .score-box.o-score span { color: #a8dadc; }
-    .score-box.draw-score span { color: #888; }
   </style>
 </head>
 <body>
 
-  <h1>TIC TAC TOE</h1>
+  <!-- Setup Screen -->
+  <div id="setup-screen">
+    <h1>TIC TAC TOE</h1>
 
-  <div id="score">
-    <div class="score-box x-score">X <span id="score-x">0</span></div>
-    <div class="score-box draw-score">Draw <span id="score-d">0</span></div>
-    <div class="score-box o-score">O <span id="score-o">0</span></div>
+    <div class="player-card">
+      <h3>Player 1</h3>
+      <input type="text" id="p1-name" placeholder="Enter your name" maxlength="16" />
+      <div class="symbol-choice">
+        <button class="symbol-btn selected-x" data-player="1" data-sym="X">X</button>
+        <button class="symbol-btn" data-player="1" data-sym="O">O</button>
+      </div>
+    </div>
+
+    <div class="player-card">
+      <h3>Player 2</h3>
+      <input type="text" id="p2-name" placeholder="Enter your name" maxlength="16" />
+      <div class="symbol-choice">
+        <button class="symbol-btn" data-player="2" data-sym="X">X</button>
+        <button class="symbol-btn selected-o" data-player="2" data-sym="O">O</button>
+      </div>
+    </div>
+
+    <div class="error-msg" id="setup-error"></div>
+    <button id="start-btn">START GAME</button>
   </div>
 
-  <div id="status">Player X's turn</div>
+  <!-- Game Screen -->
+  <div id="game-screen">
+    <h1>TIC TAC TOE</h1>
 
-  <div id="board">
-    <div class="cell" data-i="0"></div>
-    <div class="cell" data-i="1"></div>
-    <div class="cell" data-i="2"></div>
-    <div class="cell" data-i="3"></div>
-    <div class="cell" data-i="4"></div>
-    <div class="cell" data-i="5"></div>
-    <div class="cell" data-i="6"></div>
-    <div class="cell" data-i="7"></div>
-    <div class="cell" data-i="8"></div>
+    <div id="score">
+      <div class="score-box p1">
+        <div class="player-name" id="p1-label">Player 1</div>
+        <div class="player-symbol" id="p1-sym">X</div>
+        <div class="player-score" id="score-p1">0</div>
+      </div>
+      <div class="score-box draw">
+        <div class="player-name">Draw</div>
+        <div class="player-symbol">—</div>
+        <div class="player-score" id="score-d">0</div>
+      </div>
+      <div class="score-box p2">
+        <div class="player-name" id="p2-label">Player 2</div>
+        <div class="player-symbol" id="p2-sym">O</div>
+        <div class="player-score" id="score-p2">0</div>
+      </div>
+    </div>
+
+    <div id="status">Loading...</div>
+
+    <div id="board">
+      <div class="cell" data-i="0"></div>
+      <div class="cell" data-i="1"></div>
+      <div class="cell" data-i="2"></div>
+      <div class="cell" data-i="3"></div>
+      <div class="cell" data-i="4"></div>
+      <div class="cell" data-i="5"></div>
+      <div class="cell" data-i="6"></div>
+      <div class="cell" data-i="7"></div>
+      <div class="cell" data-i="8"></div>
+    </div>
+
+    <button id="restart">Next Round</button>
+    <button id="change-players">Change Players</button>
   </div>
 
-  <button id="restart">Restart</button>
+  <!-- Result Overlay -->
+  <div id="result-overlay">
+    <canvas id="particle-canvas"></canvas>
+    <div id="result-box">
+      <div id="result-emoji"></div>
+      <div id="result-title"></div>
+      <div id="result-subtitle"></div>
+      <button id="result-next">Next Round</button>
+    </div>
+  </div>
 
   <script>
     const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 
-    let board, current, gameOver, scores;
+    // ── Player state ──
+    let players = { 1: { name: '', sym: 'X' }, 2: { name: '', sym: 'O' } };
+    let scores = { 1: 0, 2: 0, D: 0 };
+    let board, currentSym, gameOver;
 
-    function init(resetScores = false) {
-      board = Array(9).fill(null);
-      current = "X";
-      gameOver = false;
-      if (resetScores || !scores) scores = { X: 0, O: 0, D: 0 };
+    // ── Setup screen logic ──
+    const symBtns = document.querySelectorAll('.symbol-btn');
+    symBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = btn.dataset.player;
+        const sym = btn.dataset.sym;
+        const other = p === '1' ? '2' : '1';
 
-      document.querySelectorAll(".cell").forEach(c => {
-        c.textContent = "";
-        c.className = "cell";
+        // set this player's choice
+        document.querySelectorAll(`[data-player="${p}"]`).forEach(b => {
+          b.className = 'symbol-btn';
+        });
+        btn.classList.add(sym === 'X' ? 'selected-x' : 'selected-o');
+        players[p].sym = sym;
+
+        // auto-set the other player to the opposite
+        const otherSym = sym === 'X' ? 'O' : 'X';
+        document.querySelectorAll(`[data-player="${other}"]`).forEach(b => {
+          b.className = 'symbol-btn';
+          if (b.dataset.sym === otherSym) b.classList.add(otherSym === 'X' ? 'selected-x' : 'selected-o');
+        });
+        players[other].sym = otherSym;
       });
-      setStatus(`Player ${current}'s turn`);
+    });
+
+    document.getElementById('start-btn').addEventListener('click', () => {
+      const n1 = document.getElementById('p1-name').value.trim();
+      const n2 = document.getElementById('p2-name').value.trim();
+      const err = document.getElementById('setup-error');
+
+      if (!n1 || !n2) { err.textContent = 'Both players need a name!'; return; }
+      if (n1.toLowerCase() === n2.toLowerCase()) { err.textContent = 'Players must have different names!'; return; }
+      if (players[1].sym === players[2].sym) { err.textContent = 'Players must choose different symbols!'; return; }
+
+      err.textContent = '';
+      players[1].name = n1;
+      players[2].name = n2;
+
+      document.getElementById('p1-label').textContent = n1;
+      document.getElementById('p2-label').textContent = n2;
+      document.getElementById('p1-sym').textContent = players[1].sym;
+      document.getElementById('p2-sym').textContent = players[2].sym;
+
+      scores = { 1: 0, 2: 0, D: 0 };
       updateScoreDisplay();
+
+      document.getElementById('setup-screen').style.display = 'none';
+      document.getElementById('game-screen').style.display = 'flex';
+      initGame();
+    });
+
+    document.getElementById('change-players').addEventListener('click', () => {
+      document.getElementById('game-screen').style.display = 'none';
+      document.getElementById('setup-screen').style.display = 'flex';
+    });
+
+    // ── Game logic ──
+    function initGame() {
+      board = Array(9).fill(null);
+      currentSym = players[1].sym;
+      gameOver = false;
+      document.querySelectorAll('.cell').forEach(c => {
+        c.textContent = '';
+        c.className = 'cell';
+      });
+      setStatus(`${nameOf(currentSym)}'s turn (${currentSym})`);
+    }
+
+    function nameOf(sym) {
+      return players[1].sym === sym ? players[1].name : players[2].name;
+    }
+
+    function playerNumOf(sym) {
+      return players[1].sym === sym ? 1 : 2;
     }
 
     function setStatus(msg) {
-      document.getElementById("status").textContent = msg;
+      document.getElementById('status').textContent = msg;
     }
 
     function updateScoreDisplay() {
-      document.getElementById("score-x").textContent = scores.X;
-      document.getElementById("score-o").textContent = scores.O;
-      document.getElementById("score-d").textContent = scores.D;
+      document.getElementById('score-p1').textContent = scores[1];
+      document.getElementById('score-p2').textContent = scores[2];
+      document.getElementById('score-d').textContent = scores.D;
     }
 
     function checkWinner() {
       for (const [a, b, c] of WINS) {
-        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-          return [a, b, c];
-        }
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) return [a, b, c];
       }
       return null;
     }
 
-    document.getElementById("board").addEventListener("click", e => {
-      const cell = e.target.closest(".cell");
+    document.getElementById('board').addEventListener('click', e => {
+      const cell = e.target.closest('.cell');
       if (!cell || gameOver || board[cell.dataset.i]) return;
 
       const i = cell.dataset.i;
-      board[i] = current;
-      cell.textContent = current;
-      cell.classList.add(current.toLowerCase(), "taken");
+      board[i] = currentSym;
+      cell.textContent = currentSym;
+      cell.classList.add(currentSym.toLowerCase(), 'taken');
 
       const win = checkWinner();
       if (win) {
-        win.forEach(idx => document.querySelector(`[data-i="${idx}"]`).classList.add("win"));
-        setStatus(`Player ${current} wins! 🎉`);
-        scores[current]++;
+        win.forEach(idx => document.querySelector(`[data-i="${idx}"]`).classList.add('win'));
+        const winnerName = nameOf(currentSym);
+        const loserSym = currentSym === 'X' ? 'O' : 'X';
+        const loserName = nameOf(loserSym);
+        scores[playerNumOf(currentSym)]++;
         updateScoreDisplay();
         gameOver = true;
+        setStatus(`${winnerName} wins!`);
+        showResult('win', winnerName, loserName);
       } else if (board.every(Boolean)) {
-        setStatus("It's a draw!");
         scores.D++;
         updateScoreDisplay();
         gameOver = true;
+        setStatus("It's a draw!");
+        showResult('draw', '', '');
       } else {
-        current = current === "X" ? "O" : "X";
-        setStatus(`Player ${current}'s turn`);
+        currentSym = currentSym === 'X' ? 'O' : 'X';
+        setStatus(`${nameOf(currentSym)}'s turn (${currentSym})`);
       }
     });
 
-    document.getElementById("restart").addEventListener("click", () => init());
+    document.getElementById('restart').addEventListener('click', initGame);
+    document.getElementById('result-next').addEventListener('click', () => {
+      closeOverlay();
+      initGame();
+    });
 
-    init(true);
+    // ── Result overlay ──
+    function showResult(type, winner, loser) {
+      const overlay = document.getElementById('result-overlay');
+      const emoji = document.getElementById('result-emoji');
+      const title = document.getElementById('result-title');
+      const sub = document.getElementById('result-subtitle');
+
+      if (type === 'win') {
+        emoji.textContent = '🏆';
+        title.textContent = `${winner} Wins!`;
+        title.style.color = '#e94560';
+        sub.textContent = `${loser} better luck next time! 😅`;
+        overlay.classList.add('show');
+        launchStars();
+        launchLoserRain(loser);
+      } else {
+        emoji.textContent = '🤝';
+        title.textContent = "It's a Draw!";
+        title.style.color = '#a8dadc';
+        sub.textContent = 'Great minds think alike!';
+        overlay.classList.add('show');
+        launchDrawConfetti();
+      }
+    }
+
+    function closeOverlay() {
+      document.getElementById('result-overlay').classList.remove('show');
+      stopParticles();
+      document.querySelectorAll('.drop').forEach(d => d.remove());
+    }
+
+    // ── Winner star animation ──
+    let animFrame;
+    const stars = [];
+
+    function launchStars() {
+      const canvas = document.getElementById('particle-canvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const ctx = canvas.getContext('2d');
+      stars.length = 0;
+
+      for (let i = 0; i < 80; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * -canvas.height,
+          size: Math.random() * 18 + 8,
+          speed: Math.random() * 3 + 2,
+          char: ['⭐','🌟','✨'][Math.floor(Math.random()*3)],
+          angle: Math.random() * 360,
+          spin: (Math.random() - 0.5) * 4,
+          opacity: Math.random() * 0.5 + 0.5
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        stars.forEach(s => {
+          s.y += s.speed;
+          s.angle += s.spin;
+          if (s.y > canvas.height + 40) {
+            s.y = -40;
+            s.x = Math.random() * canvas.width;
+          }
+          ctx.save();
+          ctx.globalAlpha = s.opacity;
+          ctx.font = `${s.size}px serif`;
+          ctx.translate(s.x, s.y);
+          ctx.rotate(s.angle * Math.PI / 180);
+          ctx.fillText(s.char, -s.size/2, s.size/2);
+          ctx.restore();
+        });
+        animFrame = requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    function launchDrawConfetti() {
+      const canvas = document.getElementById('particle-canvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const ctx = canvas.getContext('2d');
+      const items = [];
+
+      for (let i = 0; i < 60; i++) {
+        items.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * -canvas.height,
+          size: Math.random() * 14 + 8,
+          speed: Math.random() * 2 + 1,
+          char: ['🤝','💫','🎯','🌀'][Math.floor(Math.random()*4)],
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        items.forEach(s => {
+          s.y += s.speed;
+          if (s.y > canvas.height + 40) { s.y = -40; s.x = Math.random() * canvas.width; }
+          ctx.font = `${s.size}px serif`;
+          ctx.fillText(s.char, s.x, s.y);
+        });
+        animFrame = requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    // ── Loser emoji rain ──
+    function launchLoserRain() {
+      const emojis = ['😢','😭','💔','😞','🥺'];
+      let count = 0;
+      const interval = setInterval(() => {
+        if (count++ > 18) { clearInterval(interval); return; }
+        const el = document.createElement('div');
+        el.className = 'drop';
+        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        el.style.fontSize = (Math.random() * 16 + 20) + 'px';
+        document.body.appendChild(el);
+        el.addEventListener('animationend', () => el.remove());
+      }, 120);
+    }
+
+    function stopParticles() {
+      if (animFrame) cancelAnimationFrame(animFrame);
+      const canvas = document.getElementById('particle-canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
   </script>
 
 </body>
